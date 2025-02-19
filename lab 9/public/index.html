@@ -1,89 +1,129 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
-
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/11.3.1/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/11.3.1/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/11.3.1/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>กฤษฎา เกาประโคน</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+<head>
+    <title>Firebase Chat</title>
+    <style>
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
         }
-      });
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .sent {
+            background-color: #e3f2fd;
+            margin-left: 20%;
+        }
+        .received {
+            background-color: #f5f5f5;
+            margin-right: 20%;
+        }
+        #tokenDisplay {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+    <div id="tokenDisplay">FCM Token: Loading...</div>
+
+    <script src="./firebase.config.js"></script>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-messaging.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const messaging = getMessaging(app);
+
+        // Reference to messages in database
+        const messagesRef = ref(database, 'messages');
+
+        // Generate a random user ID (in a real app, this would come from authentication)
+        const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+
+        // Request notification permission and get FCM token
+        async function initializeMessaging() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const token = await getToken(messaging, {
+                        vapidKey: 'BJReewRK4nW34L0xSw7HyLtwO74EtxknNY0GGn4o6UV_9vp1nhPaT3_Yvwql3rBh815d3ppMy9TywY1SPnWJXcw' // Replace with your VAPID key
+                    });
+                    // Display token in UI
+                    document.getElementById('tokenDisplay').textContent = `FCM Token: ${token}`;
+                    console.log('FCM Token:', token);
+                    // Store token in database for this user
+                    const tokenRef = ref(database, `users/${userId}/fcmToken`);
+                    await set(tokenRef, token);
+                }
+            } catch (error) {
+                console.error('Error getting permission or token:', error);
+                document.getElementById('tokenDisplay').textContent = 
+                    `Error getting FCM token: ${error.message}`;
+            }
+        }
+
+        // Initialize messaging when page loads
+        initializeMessaging();
+
+        // Listen for new messages
+        onChildAdded(messagesRef, (snapshot) => {
+            const message = snapshot.val();
+            displayMessage(message);
+        });
+
+        // Display message in UI
+        function displayMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${message.userId === userId ? 'sent' : 'received'}`;
+            messageElement.textContent = `${message.text}`;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Send message function
+        window.sendMessage = async function() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                // Push new message to database
+                await push(messagesRef, {
+                    userId: userId,
+                    text: text,
+                    timestamp: Date.now()
+                });
+                
+                input.value = '';
+            }
+        };
+
+        // Listen for enter key in input
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
